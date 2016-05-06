@@ -5,9 +5,14 @@ socket.on('connect', function() {
 });
 
 socket.on('message', function(message) {
+//  var moment = moment();
+  var now = moment.utc(message.time);
+
+  console.log(now.format('h:mm:ss a'));
+
   console.log('New Message:');
   console.log(message.text);
-  jQuery('.incomming-messages').append('<p>' + message.text + '</p>');
+  jQuery('.incomming-messages').append('<p><strong>' + now.local().format('h:mm:ss a') + '</strong> > ' + message.text + '</p>');
 });
 
 var $form = jQuery('#message-form');
