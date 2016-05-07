@@ -6,10 +6,16 @@
   </head>
   <body>
     <h1>Join chat!</h1>
-    <form action="/chat.html">
-      <label>Display Name</label>
-      <input type="text" name="name"/>
-      <input type="submit" value="Join Chat"/>
+    <form action="/chat.html" method ="get">
+      <fieldset>
+        <label>User Name</label>
+        <input type="text" name="name"/>
+        <br/>
+        <label>Room Name</label>
+        <input type="text" name="room"/>
+        <br/>
+        <input type="submit" value="Join Chat"/>
+      </fieldset>
     </form>
   </body>
 </html>
