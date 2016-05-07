@@ -9,6 +9,54 @@ app.use(express.static(__dirname + '/public'));
 
 var clientInfo = {};
 
+function sendPrivateMessage(socket, message) {
+  var currentUserInfo = clientInfo[socket.id];
+  var vars = message.split(' ');
+  var receiver = vars[1];
+  var sendMessage = vars[2];
+
+  Object.keys(clientInfo).forEach(function(socketId) {
+    var userInfo = clientInfo[socketId];
+
+    console.log(receiver + ' > ' + userInfo.name);
+
+    if (receiver === userInfo.name) {
+
+    console.log('send private message');
+
+      io.sockets.connected[socketId].emit('message', {
+        name: '[PRIVATE] ' + currentUserInfo.name,
+        text: sendMessage,
+        time: moment().valueOf()
+      });
+    }
+  });
+}
+
+
+// send current users to provided socket
+function sendCurrentUsers(socket) {
+  var currentUserInfo = clientInfo[socket.id];
+  var users = [];
+
+  if (typeof currentUserInfo === 'undefined') {
+    return;
+  }
+  Object.keys(clientInfo).forEach(function(socketId) {
+    var userInfo = clientInfo[socketId];
+
+    if (currentUserInfo.room === userInfo.room) {
+      users.push(userInfo.name);
+    }
+  });
+
+  socket.emit('message', {
+    name: 'System',
+    text: 'Current Users: ' + users.join(', '),
+    time: moment().valueOf()
+  });
+}
+
 io.on('connection', function(socket) {
   console.log('User connected via socket.io');
 
@@ -38,10 +86,14 @@ io.on('connection', function(socket) {
 
   // send message
   socket.on('message', function (message) {
-    message.time = moment().valueOf();
-    console.log('Message received:');
-    console.log(message.text);
-    io.to(clientInfo[socket.id].room).emit('message', message);
+    if (message.text === '@currentUsers') {  // special commands
+      sendCurrentUsers(socket);
+    } else if (message.text.indexOf('@private') > -1 ) {
+      sendPrivateMessage(socket, message.text);
+    }else {
+      message.time = moment().valueOf();
+      io.to(clientInfo[socket.id].room).emit('message', message);
+    }
   });
 
   // connect to server
