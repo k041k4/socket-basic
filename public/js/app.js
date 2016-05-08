@@ -19,8 +19,11 @@ socket.on('message', function(message) {
   var $message = jQuery('.incomming-messages');
 
   // add message
-  $message.append('<p><strong>' + message.name + ' ' + now.local().format('h:mm:ss a') + '</strong></p>');
-  $message.append('<p>' + message.text + '</p>');
+  if (message.name === 'System') {
+    $message.append('<li class="list-group-item"><span class="badge">' + now.local().format('h:mm:ss a') + '</span>' + "<span class=\"label label-danger\">" + message.name + "</span>\ " + message.text + "</li>");
+  } else {
+    $message.append('<li class="list-group-item"><span class="badge">' + now.local().format('h:mm:ss a') + '</span>' + "<span class=\"label label-primary\">" + message.name + "</span>\ " + message.text + "</li>");
+  }
 });
 
 var $form = jQuery('#message-form');
